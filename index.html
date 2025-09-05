@@ -15,8 +15,7 @@
                 color: #4b5563; /* darkgray */
                 background-color: #ffffff; /* white */
             }
-            h1,
-            h2 {
+            h1, h2, h3 {
                 font-family: "Quicksand", sans-serif;
                 color: #026b7c; /* green */
             }
@@ -32,7 +31,8 @@
             .btn-yes,
             .btn-more-info,
             .btn-no,
-            .btn-close {
+            .btn-close,
+            .btn-start-over {
                 transition:
                     transform 0.2s ease-in-out,
                     box-shadow 0.2s ease-in-out;
@@ -41,14 +41,15 @@
             .btn-yes:hover,
             .btn-more-info:hover,
             .btn-no:hover,
-            .btn-close:hover {
+            .btn-close:hover,
+            .btn-start-over:hover {
                 transform: translateY(-2px);
                 box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             }
             .btn-yes {
                 background-color: #00afb1; /* turquoise green */
             }
-            .btn-more-info {
+            .btn-more-info, .btn-start-over {
                 background-color: #fec116; /* orange */
             }
             .btn-no,
