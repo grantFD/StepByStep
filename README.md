@@ -1,1 +1,1 @@
-This a the latest version of the Upgrade Guru - this time with HTML as format and created in the SxSeditor app, with edits
+This a the latest version of the Phone Upgrade Guide - based on the FD Interactive Guide App
