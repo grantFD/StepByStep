@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Guide</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;700&family=Open+Sans:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Open Sans', sans-serif;
+            color: #4b5563; /* darkgray */
+            background-color: #ffffff; /* white */
+        }
+        h1, h2 {
+            font-family: 'Quicksand', sans-serif;
+            color: #026b7c; /* green */
+        }
+        .header-bg {
+            background-color: #00afb1; /* turquoise */
+        }
+        .header-text {
+            color: #ffffff; /* white */
+        }
+        .btn-yes, .btn-more-info, .btn-no, .btn-close, .btn-start-over, .btn-back, .btn-download {
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+            cursor: pointer;
+        }
+        .btn-yes:hover, .btn-more-info:hover, .btn-no:hover, .btn-close:hover, .btn-start-over:hover, .btn-back:hover, .btn-download:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .btn-yes {
+            background-color: #00afb1; /* turquoise green */
+        }
+        .btn-more-info {
+            background-color: #fec116; /* orange */
+        }
+        .btn-no, .btn-close {
+            background-color: #f16375; /* red */
+        }
+        .btn-back {
+             background-color: #fec116; /* orange */
+        }
+        .btn-download {
+            background-color: #00afb1;
+            border: 2px solid #ffffff;
+            transition: background-color 0.2s ease-in-out, transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+        .btn-download:hover {
+            background-color: #009698;
+        }
+        .btn-download-icon {
+            color: #ffffff;
+        }
+        .how-to-block {
+            background-color: #e4e0d2; /* offwhite */
+            border-left: 5px solid #fec116; /* yellow */
+        }
+        .more-info-block {
+            background-color: #dce5e5;
+            border-right: 5-px solid #026b7c;
+            position: relative;
+        }
+        .page-container {
+            min-height: calc(100vh - 8rem); /* Adjust based on header/footer height */
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        .logo-icon {
+            font-size: 2rem;
+            line-height: 1;
+        }
+        .error-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #f16375;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            z-index: 2000;
+        }
+        .message-bar {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #026b7c;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            z-index: 1500;
+        }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen">
+
+    <!-- Main app container -->
+    <div id="app" class="flex flex-col flex-1"></div>
+    
+    <!-- Error screen for data integrity issues -->
+    <div id="error-screen" class="error-screen hidden">
+        <h1 class="text-3xl md:text-5xl font-bold mb-4">Error</h1>
+        <p id="error-message" class="text-xl md:text-2xl w-3/4"></p>
+    </div>
+
+    <!-- Temporary message bar for success messages -->
+    <div id="message-bar" class="message-bar hidden"></div>
+    
+    <script>
+        // Data for all pages
+        const pages = {
+  
+'start': {
+    type: 'step',
+    title: 'Should you replace your phone?',
+    content: `<p></p>
+<p class="mb-4"><img src="oldphones3_300.webp" class="mx-auto my-4 rounded-lg w-full sm:max-w-[300px] h-auto" alt="User-provided image"></img>
+</p>
+<p class="mb-4">Your phone gets old in two main ways: its physical parts wear out, especially the battery, and its software becomes outdated. Outdated software is the bigger problem because it can no longer protect your phone from the latest viruses and security threats.</p>
+<p class="mb-4 ">Every year, phone companies release new software and stop supporting older models. For example, Apple just released iOS 26 for the new iPhone 17, and Android has its newest version, Android 16. Older phones can no longer get these important updates.
+</p>
+<p class="mb-4">This guide will help you figure out if your phone is past its prime. We'll show you how to check your battery's health and see if your phone is still getting security updates. If it’s time for a new phone, we’ll walk you through how to easily move your data and safely get rid of your old device.
+</p>
+<p><b>NOTE: </b> This guide uses Apple iPhones and Samsung Android phones as examples, because they are very common in New Zealand. If you have a different phone, the steps might be slightly different. Use your phone’s search function in the settings to find what you need. 
+    </p>
+<div class="more-info-block p-4 rounded-md my-4">
+    <p class="font-bold">More Info
+    </p>
+    <p>Learn more about this app by clicking <a href="#startMoreinfo" class="open-detail-modal text-blue-500 underline">this link.</a>
+    </p>
+</div>`,
+    question: 'Are you ready to begin?',
+    nextStep: 'step1',
+            },
+
+'step1': {
+    type: 'step',
+    title: '1.   Is your phone working well?',
+    content: `<p class="mb-4 ">Sometimes it can be hard to know when a phone is truly "too old" and it's time to replace it. The simple rule is that if your phone is no longer reliably doing the things you need it to, and the problems are not easily or affordably fixed, it’s probably time to consider a new one.
+</p>
+<h2 class="text-xl font-bold mb-2">Battery issues
+</h2>
+<p class="mb-4 ">Pay attention to common signs of a phone that has reached the end of its useful life. The most obvious issues are with the battery, which may not last the day, or a phone that has become noticeably slow.  If your phone's battery dies quickly, even with minimal use, or needs constant recharging, its capacity has likely degraded significantly.
+</p>
+<p class="mb-4 ">Batteries typically lose efficiency after 500-1000 charge cycles (2-4 years).  iPhone batteries are rated to hold 80% of their capacity for up to 500 charge cycles, which means roughly 18-24 months for most users. After that, you may notice performance issues with your phone, which means it’s time for a new battery. As Samsung says ”batteries are consumables, which naturally wear out over time”. See More Info for how to check battery health.
+</p>
+<p class="mb-4 ">If apps take a long time to open, or the phone freezes and restarts on its own, its internal parts may no longer be able to keep up with modern demands. This can also show up when you are constantly having to delete photos, videos, or apps to free up storage, which newer phones typically offer.
+</p>
+<p class="mb-4 ">Additionally, consider the software and network capabilities of your phone. Older phone networks, such as 3G, are becoming obsolete and if your phone can't connect to the newer 5G networks then it’s no longer useful. And if you can’t connect to the latest wifi networks (like wifi6), you are missing out on a significant improvement in performance. These issues combined are a good indicator that it’s time to move on to a newer, more capable device.
+</p>
+<div class="more-info-block p-4 rounded-md my-4">
+    <p class="font-bold">More Info
+    </p>
+    <p><a href="#step1Moreinfo" class="open-detail-modal text-blue-500 underline">How to check your battery health</a>
+    </p>
+</div>
+`,
+    question: 'Is your phone working well?',
+    nextStep: 'step2',
+    previousStep: 'start',
+    noStep: 'replace'
+},
+
+'startMoreinfo': {
+    type: 'detail',
+    title: 'About this app',
+    content: `<p class="mb-4 ">This guide has been developed by Digital Seniors as a tool for seniors and coaches. It is based on years of experience and knowledge, validated by research and best practice.
+</p>
+<p class="mb-4 ">We hope you like it, and that it helps you.
+</p>
+<p class="mb-4 ">We’re always keen to receive feedback (glowing preferred, but any type accepted) so if you have any comments or suggestions please email <u>contact@digitalseniors.co.nz.</u>
+</p>`
+},
+
+                step1Moreinfo: {
+                    type: "detail",
+                    title: "How to check your phone battery health",
+                    content: `
+                            <h2 class="text-xl font-bold mb-2">How to check and optimise your battery health</h2><div class="how-to-block p-4 rounded-md my-4">
+                                            <p class="font-bold">Apple iPhone health</p>
+                                            <p>To Review your iPhone battery health Go to <b>Settings </b> &gt; <b>Battery,</b> then tap<b> Battery Health &amp; Charging</b>. The iPhone displays information about your battery’s capacity, peak performance, and whether your battery needs to be serviced.</p></div><div class="how-to-block p-4 rounded-md my-4">
+                                            <p class="font-bold">Samsung Android&nbsp; health</p><p><span>On some Samsung devices you will get a notification message on your device warning of battery deterioration. You can also use the free Samsung Members application to run tests of your phone, including the battery condition. Unfortunately it does not show a count of the number of battery charge cycles.&nbsp;</span></p></div><p class="mb-4 ">Whatever your situation you should always give your battery the best chance of a long life by avoiding regularly draining your battery to 0% or charging it to 100% all the time. Aim to keep it between 20% and 80%.&nbsp;</p><div class="how-to-block p-4 rounded-md my-4">
+                                            <p class="font-bold">Apple iPhone battery optimisation</p>
+                                            <p>On iPhones you can go to <b>Settings</b> &gt; <b>Battery</b> &gt; <b>Battery health and Charging</b> then turn on <b>Optimized Battery Charging</b>. On newer models running iOS 18 or later (iPhones 15 on) you can also set limits by going to <b>Settings</b> &gt; <b>Battery</b> &gt; <b>Charging</b>.</p></div><div class="how-to-block p-4 rounded-md my-4">
+                                            <p class="font-bold">Android battery optimisation</p>
+                                            <p>On an Android you can set an upper limit under <b>Settings</b> &gt; <b>Battery and Battery protection.&nbsp;</b></p></div><h2 class="text-xl font-bold mb-2">How to buy a replacement battery</h2><p class="mb-4 ">If you've tried the steps to eke out your battery (see links below) and are still experiencing significant battery drain, you might need a new battery to resolve the problem. Contact your device manufacturer or the retailer where you purchased the phone for further assistance and to get a quote for a replacement battery. It might be cheaper to upgrade to a newer model that offers improved battery technology and capacity.
+                            </p><p class="mb-4 ">If you have paid the extra for AppleCare+ and your product's battery holds less than 80 percent of its original capacity then you may be eligible for a battery replacement at no additional cost. If you don’t then Apple in NZ can replace your battery for a few hundred dollars.
+                            </p><p class="mb-4 ">&nbsp;<a href="https://support.apple.com/en-nz/iphone/repair/battery-replacement" class="text-blue-500 underline">Apple battery replacement&nbsp;</a>&nbsp;</p><p class="mb-4 ">&nbsp;<a href="https://www.samsung.com/nz/support/galaxy-battery/" class="text-blue-500 underline">Samsung battery information</a></p><p class="mb-4 ">
+                            </p>
+                                `,
+                },
+  
+'step2': {
+    type: 'step',
+    title: '2. Is your phone no longer supported?',
+    content: `<p class="mb-4 ">One of the most important things to consider when your phone is getting old is whether it is still receiving software and security updates from its manufacturer. When these updates stop, your phone can become an easy target for viruses and other digital threats, because the company is no longer fixing any new security weaknesses. This is a critical indicator that it's time to think about an upgrade, as most mobile threats rely on out-of-date software.
+</p>
+<div class="more-info-block p-4 rounded-md my-4">
+    <p class="font-bold">More Info
+    </p>
+    <p><a href="#step2Moreinfo" class="open-detail-modal text-blue-500 underline">How to check your phone is up to date and secure</a>
+    </p>
+</div>
+<h2 class="text-xl font-bold mb-2">Android
+</h2>
+<p class="mb-4 ">When it comes to Android phones, the support period can vary. In the past, Android phones might only get a couple of years of updates, but now many manufacturers, like Google and Samsung, are promising to support their flagship phones for seven years or more.
+</p>
+<p class="mb-4 ">At the time of writing (Sept 2025) any phone running Android versions 12 or older is no longer getting security patches from Google. Versions 13 to the latest Android 16 are fully supported..
+</p>
+<h2 class="text-xl font-bold mb-2">Apple
+</h2>
+<p class="mb-4 ">Apple has always been known for providing long-term support for its iPhones. While they haven't always given a specific number of years, they typically provide major updates for about five to seven years and often continue to release security updates for even older models. 
+</p>
+<p class="mb-4 ">At the time of writing (Sep 2025)  Apple models up to iPhone X (10) are obsolete and can no longer receive the latest OS updates.
+</p>
+`,
+    question: 'Has support for your phone ended?',
+    nextStep: 'replace',
+    previousStep: 'step1',
+    noStep: 'finish'
+},
+                step2Moreinfo: {
+                    type: "detail",
+                    title: "Check for Updates",
+                    content: `
+                <h2 class="text-xl font-bold mb-2">How to check whether your phone is running the latest updates</h2><div class="how-to-block p-4 rounded-md my-4">
+                                <p class="font-bold">Apple iPhone</p><p class="font-bold"><br></p>
+                                <p>Go to <b>Settings</b> &gt; <b>General</b> &gt; <b>Software Update</b> on your device.&nbsp;</p><p>Keep your iPhone updated to the latest available iOS version to ensure you have the most recent security patches and features for your model iPhone.</p><p>As at July 25 anything newer than an iPhone 10 (X models) is supported. Older models are not.</p></div><p class="mb-4 ">&nbsp;</p><div class="how-to-block p-4 rounded-md my-4">
+                                <p class="font-bold">Android (exact wording may vary by model, version)</p><p class="font-bold"><br></p><p class="font-bold"><i>1. Check for updates &amp; fixes (and see if any are available)</i></p><p>Open your device's <b>Settings</b> &gt; <b>System</b> &gt; <b>Software update</b> or <b>System update.</b></p><p>Tap <b>Check for updates</b>. Your phone will then search for any available updates and tell you if your system is up to date.</p><p>You can also check how recently your phone received critical security fixes.&nbsp;</p><p>Open your device's <b>Settings</b>&gt; S<b>ecurity &amp; privacy</b> &gt; <b>System &amp; updates</b> (or similar).</p><p>Look for Security update or Android security update. You'll see a date here (e.g., "July 5, 2025"). This date indicates the last security patch your phone received.&nbsp; You might also find a Google Play system update section, which also shows a date for updates to core Android components delivered via the Play Store.</p><p><br></p><p>Google typically releases monthly security patches. If your phone's security update date is more than 2-3 months old, it's a strong indicator that your device is no longer receiving regular security updates and could be at higher risk.</p><p><br></p><p><b><i>2. Check your Android OS Version</i></b></p><p>Open your device's <b>Settings</b>&gt;<b> About phone</b></p><p>Look for "<b>Android version</b>." This will tell you the major Android version number (e.g., "Android 14").&nbsp;</p><p>As at Sept 25 all versions above 13 and above are supported.</p></div>
+                                </p><p class="mb-4 ">&nbsp;<a href="https://www.refurb.me/blog/how-long-does-apple-support-iphones" class="text-blue-500 underline">How long does apple support iPhones?&nbsp;</a>&nbsp;</p><p class="mb-4 ">&nbsp;<a href="https://endoflife.date/samsung-mobile" class="text-blue-500 underline">Samsung end of life dates</a></p><p class="mb-4 ">
+                    `,
+                },
+
+'replace': {
+    type: 'step',
+    title: 'Time for a replacement',
+    content: `<p class="mb-4 ">So, it’s time for a new smartphone. This can feel overwhelming, but a little planning goes a long way. Here are some simple tips to make the process easier and ensure you get the right device for you:
+</p>
+<h2 class="text-xl font-bold mb-2">Stick with What You Know
+</h2>
+<p class="mb-4 ">Most people are either an Android person or an Apple person, and it’s often easiest to stick with the operating system you're familiar with. While you can switch, it means getting used to a new way of doing things, and you may have to repurchase apps you already bought.
+</p>
+<p class="mb-4 ">A great tip is to match your new phone with other devices you already own. If you have an Apple computer or an iPad, then an iPhone is a great choice. If you use a Windows PC or an Android tablet, an Android phone will likely work better for you. This makes it easier to share files and have all your devices work together seamlessly.
+</p>
+<h2 class="text-xl font-bold mb-2">Time Your Purchase
+</h2>
+<p class="mb-4 ">New models of popular smartphones come out every year, and it can be a good idea to time your purchase around these releases. Apple typically announces new iPhones in September, right before the holiday season. Samsung releases its flagship Galaxy S series in early in the year, with other models spread throughout. A quick online search for the specific model you're interested in can tell you if a new version is coming out soon.
+</p>
+<h2 class="text-xl font-bold mb-2">Buy Smartly
+</h2>
+<p class="mb-4 ">You don't always need the latest and most expensive phone. Most brands offer a range of good, better, and best models. Think about what you really need and how you'll use the phone, and choose the model that fits your budget and lifestyle—not the one a salesperson is pushing. Also, keep an eye out for sales, but don't fall for "one-time specials" because discounts are always available somewhere. Your mobile provider can also be a good resource; they often offer trade-in deals and payment plans to help you spread out the cost.
+</p>
+<div class="more-info-block p-4 rounded-md my-4">
+    <p class="font-bold">More Info
+    </p>
+    <p><a href="#replaceMoreinfo" class="open-detail-modal text-blue-500 underline">How to prepare your old phone for a smooth transfer to a new one.</a>
+    </p>
+</div>`,
+    question: 'Do you need to dispose of your old phone?',
+    nextStep: 'dispose',
+    noStep: 'finish'
+},
+
+'replaceMoreinfo': {
+    type: 'detail',
+    title: 'Prepare for a Smooth Transfer',
+    content: `<p class="mb-4 ">Once you have your new phone, moving your information over is simple if you prepare your old one first.
+</p>
+<p class="mb-4 "></p>
+<ul class="list-disc list-inside space-y-1 mb-4">
+    <li>Update your old phone's software to the latest version.
+    </li>
+    <li>Back up your data. Use the phone's built-in cloud service (like iCloud for iPhones or Samsung Cloud for Androids), or save your data to a computer.
+    </li>
+    <li>Use the phone's transfer tool. Most phones have a simple process to move your data. iPhones use a tool called <b>Quick Start</b>, and Samsung phones have an app called <b>Smart Switch</b>. You just place the two phones next to each other, and they will guide you through the process, which can take some time.
+    </li>
+</ul>
+<p class="mb-4 ">Your phone company may offer to help you with this for free, but you will need to give them access to your phone and passwords, and they might charge for the service. It’s often easier and safer to do it yourself in the store with their guidance.
+</p>`
+},
+
+'dispose': {
+    type: 'step',
+    title: 'Disposing of your old phone',
+    content: `<h2 class="text-xl font-bold mb-2">Make a backup
+</h2>
+<p class="mb-4 ">Before you get rid of an old smartphone, it is important to take a few steps to protect your personal information and make sure the phone is disposed of properly. The first thing you need to do is make sure all your data, like photos and contacts, has been safely moved to your new phone. You can also make an extra backup of everything to a computer or an external drive, just to be safe.
+</p>
+<h2 class="text-xl font-bold mb-2">Sign out and reset
+</h2>
+<p class="mb-4 ">Next disconnect it from any cloud service and sign out of all accounts. Then completely erase all your personal information from the old phone. This is done by performing a "factory reset." . A factory reset returns the phone to the way it was when you first bought it. On most modern smartphones, this process also wipes the data securely, making it nearly impossible for anyone to recover your private information. You should also be sure to remove your SIM card and any memory cards you might have in the device.
+</p>
+<p class="mb-4">Here's how to perform a factory reset on your specific phone model:
+</p>
+<div class="how-to-block p-4 rounded-md my-4">
+    <p class="font-bold">Apple iPhone
+    </p>
+    <p>Go to <b>Settings</b>><b> General</b>><b> Transfer</b> or<b> Reset iPhone</b>. Tap<b> Erase All Content and Settings</b>
+    </p>
+</div>
+<div class="how-to-block p-4 rounded-md my-4">
+    <p class="font-bold">Android (Samsung example)
+    </p>
+    <p>Go to<b> Settings</b>, and then tap<b> General management</b>. Swipe to and tap<b> Reset</b>, then tap<b> Factory data reset</b>
+    </p>
+</div>
+<h2 class="text-xl font-bold mb-2">Dispose of your phone
+</h2>
+<div>Finally, once your data is safely gone, it’s time to decide how to get rid of the phone. You might be able to sell or gift it if it's still in good working order, but the safest option is to recycle it.
+</div>
+<div class="more-info-block p-4 rounded-md my-4">
+    <p class="font-bold">More Info
+    </p>
+    <p><a href="#disposeMoreinfo" class="open-detail-modal text-blue-500 underline">How to recycle your old phone</a>
+    </p>
+</div>`,
+    question: 'Have you safely disposed on your old phone?',
+    nextStep: 'finish',
+    previousStep: 'replace'
+},
+
+'disposeMoreinfo': {
+    type: 'detail',
+    title: 'Safely disposing of your phone',
+    content: `<p class="mb-4 ">Finally, once your data is safely gone, it’s time to decide how to get rid of the phone. You might be able to sell or gift it if it's still in good working order, but the safest option is to recycle it. Mobile phone stores and recycling centres often have special programs for old electronics, sometimes called "e-waste," which ensures that the materials are handled safely and don’t harm the environment.
+</p>
+<p class="mb-4 ">RE:MOBILE is a Ministry for the Environment accredited scheme where you can drop off unwanted phones at participating retail stores (like 2degrees, One NZ, Spark, Noel Leeming, Resene ColorShops) or mail them in. These phones are either refurbished for reuse or recycled for their valuable materials, with proceeds often supporting charities like Sustainable Coastlines.
+</p>
+<p class="mb-4 ">Don’t forget to:
+</p>
+<p class="mb-4 "></p>
+<ol class="list-decimal list-inside space-y-1 mb-4">
+    <li>Leave the battery in the phone.
+    </li>
+    <li>Switch the phone off.
+    </li>
+</ol>
+<p class="mb-4 "><a href="https://remobile.org.nz" class="text-blue-500 underline">Remobile</a>
+</p>
+<p class="mb-4 "><a href="https://www.rnz.co.nz/life/lifestyle/what-do-i-need-to-do-before-throwing-away-old-tech" class="text-blue-500 underline">RNZ article on throwing away old tech</a>
+</p>`
+},
+
+
+'finish': {
+    type: 'finish',
+    title: 'All done!',
+    content: `<p class="mb-4 ">If you’ve got here then your phone either:
+</p>
+<ol class="list-decimal list-inside space-y-1 mb-4">
+    <li>has still got life in it, so it's worth keeping
+    </li>
+    <li>or you’ve got yourself a new one. Exciting!
+    </li>
+</ol>
+<p class="mb-4"><span>Either way enjoy your phone ....</span>
+</p>
+<p class="mb-4 ">
+    <br></br>
+</p>
+<p></p>
+<p class="mb-4 "><img src="Happy_phone_user.webp" class="mx-auto my-4 rounded-lg w-full sm:max-w-[300px] h-auto" alt="User-provided image"></img>
+</p>`,
+                startOver: 'step1',
+                close: true
+},
+
+        };
+
+        let currentPageId = 'start';
+        let pageHistory = [];
+        
+        // --- Core Functions ---
+
+        /**
+         * Shows a temporary message in the message bar.
+         * @param {string} message - The message to display.
+         * @param {number} [duration=3000] - The duration in milliseconds to display the message.
+         */
+        function showMessage(message, duration = 3000) {
+            const messageBar = document.getElementById('message-bar');
+            messageBar.textContent = message;
+            messageBar.classList.remove('hidden');
+            setTimeout(() => {
+                messageBar.classList.add('hidden');
+            }, duration);
+        }
+
+        /**
+         * Shows a full-screen error message and stops the application.
+         * @param {string} message - The detailed error message to display.
+         */
+        function showError(message) {
+            const errorScreen = document.getElementById('error-screen');
+            const errorMessage = document.getElementById('error-message');
+            errorMessage.textContent = message;
+            errorScreen.classList.remove('hidden');
+        }
+
+        /**
+         * Renders the UI for the current page based on the page's data.
+         */
+        function renderPage() {
+            window.scrollTo(0, 0);
+            const appDiv = document.getElementById('app');
+            const pageData = pages[currentPageId];
+            
+            // Clear previous content
+            appDiv.innerHTML = '';
+            
+            // Store page in history for back navigation
+            if (pageHistory.length === 0 || pageHistory[pageHistory.length - 1] !== currentPageId) {
+                pageHistory.push(currentPageId);
+            }
+            
+            // Create main container with animation
+            const pageContainer = document.createElement('div');
+            pageContainer.className = 'page-container flex-1 p-4 md:p-8 flex flex-col items-center';
+            
+            // Build the common page structure
+            const html = `
+                <!-- Header -->
+                <header class="header-bg text-white w-full rounded-b-lg mb-8 p-4 md:p-6 shadow-md flex flex-col items-center">
+                    <div class="flex justify-between items-center w-full max-w-2xl">
+                        <div class="flex items-center space-x-2">
+                            <span class="logo-icon"><img src="Digital Seniors Logo 100.png" </img> </span>
+                            <span class="text-white text-xl md:text-2xl font-bold">Interactive Guide</span>
+                        </div>
+                        <div class="flex items-center space-x-2 group relative">
+                            <button id="download-btn" class="btn-download w-10 h-10 rounded-full flex items-center justify-center">
+                                <!-- Download Icon SVG -->
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6 btn-download-icon">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                    <polyline points="7 10 12 15 17 10"></polyline>
+                                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                                </svg>
+                            </button>
+                             <span class="absolute right-12 bg-gray-800 text-white text-xs rounded py-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">Get PDF version</span>
+                        </div>
+                    </div>
+                </header>
+                
+                <!-- Content Card -->
+                <div class="bg-gray-50 rounded-xl shadow-xl p-8 w-full max-w-2xl flex flex-col items-center">
+                    <main class="w-full mb-8 text-xl">
+                        <h1 class="text-2xl md:text-3xl font-bold mb-4">${pageData.title}</h1>
+                        ${pageData.content}
+                    </main>
+                    <div id="navigation-block" class="navigation-block w-full mt-auto px-4"></div>
+                </div>
+            `;
+            pageContainer.innerHTML = html;
+
+            // Add navigation block based on page type
+            const navBlock = pageContainer.querySelector('#navigation-block');
+            if (pageData.type === 'step') {
+                navBlock.innerHTML = `
+                    <p class="text-lg md:text-xl font-bold mb-4 text-center">${pageData.question}</p>
+                    <div class="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-4 justify-center">
+                        ${pageData.previousStep ? `
+                            <div class="flex flex-col items-center space-y-2">
+                                <button id="back-btn" class="btn-back text-white font-bold text-xl py-3 px-6 rounded-full w-full md:w-48"> &lt; Back</button>
+                                <span class="text-xs text-center w-full md:w-48">${pages[pageData.previousStep].title}</span>
+                            </div>
+                        ` : ''}
+                        ${pageData.noStep ? `
+                            <div class="flex flex-col items-center space-y-2">
+                                <button id="no-btn" class="btn-no text-white font-bold text-xl py-3 px-6 rounded-full w-full md:w-48">No &gt;</button>
+                                <span class="text-xs text-center w-full md:w-48">${pages[pageData.noStep].title}</span>
+                            </div>
+                        ` : ''}
+                        <div class="flex flex-col items-center space-y-2">
+                            <button id="yes-btn" class="btn-yes text-white font-bold text-xl py-3 px-6 rounded-full w-full md:w-48">Yes &gt;</button>
+                            <span class="text-xs text-center w-full md:w-48">${pages[pageData.nextStep].title}</span>
+                        </div>
+                    </div>
+                `;
+            } else if (pageData.type === 'finish') {
+                navBlock.innerHTML = `
+                    <div class="flex justify-between space-x-4">
+                        ${pageData.startOver ? `<button id="start-over-btn" class="btn-yes text-white font-bold text-xl py-3 px-6 rounded-full w-1/2">Start Over</button>` : ''}
+                        ${pageData.close ? `<button id="close-btn" class="btn-close text-white font-bold text-xl py-3 px-6 rounded-full w-1/2">Close App</button>` : ''}
+                    </div>
+                `;
+            } else if (pageData.type === 'detail') {
+                 navBlock.innerHTML = `
+                    <div class="flex justify-end">
+                        <button id="close-detail-btn" class="btn-close text-white font-bold text-xl py-3 px-6 rounded-full">Close</button>
+                    </div>
+                `;
+            }
+            
+            // Add footer
+            const footer = document.createElement('footer');
+            footer.className = 'header-bg text-white w-full rounded-t-lg mt-8 p-2 text-sm text-center';
+            footer.innerHTML = `
+                <p class="text-white font-thin text-xs">&copy; 2025 FD Interactive</p>
+            `;
+            
+            appDiv.appendChild(pageContainer);
+            appDiv.appendChild(footer);
+        }
+
+        // --- Data Integrity Check ---
+
+        /**
+         * Checks the integrity of the page data.
+         * @returns {boolean} True if data is valid, false otherwise.
+         */
+        function checkDataIntegrity() {
+            const validPageTypes = ['step', 'finish', 'detail'];
+            for (const id in pages) {
+                const page = pages[id];
+                
+                if (!page.type || !page.title || !page.content) {
+                    showError(`Page "${id}" is missing a required property (type, title, or content).`);
+                    return false;
+                }
+                if (!validPageTypes.includes(page.type)) {
+                    showError(`Page "${id}" has an invalid type: "${page.type}". Must be one of: ${validPageTypes.join(', ')}.`);
+                    return false;
+                }
+                if (page.type === 'step') {
+                    if (!page.question || !page.nextStep) {
+                        showError(`Step page "${id}" is missing a required property (question or nextStep).`);
+                        return false;
+                    }
+                    if (!pages[page.nextStep]) {
+                        showError(`Step page "${id}" points to a non-existent nextStep: "${page.nextStep}".`);
+                        return false;
+                    }
+                    if (page.noStep && !pages[page.noStep]) {
+                        showError(`Step page "${id}" points to a non-existent noStep: "${page.noStep}".`);
+                        return false;
+                    }
+                    if (page.previousStep && !pages[page.previousStep]) {
+                        showError(`Step page "${id}" points to a non-existent previousStep: "${page.previousStep}".`);
+                        return false;
+                    }
+                } else if (page.type === 'finish') {
+                    if (page.startOver && !pages[page.startOver]) {
+                        showError(`Finish page "${id}" points to a non-existent startOver page: "${page.startOver}".`);
+                        return false;
+                    }
+                }
+            }
+            return true;
+        }
+
+        // --- Event Delegation ---
+
+        document.addEventListener('click', (e) => {
+            const downloadBtn = e.target.closest('#download-btn');
+            const targetPageId = e.target.closest('.open-detail-modal')?.getAttribute('href')?.substring(1);
+            
+            // Handle download button specifically
+            if (downloadBtn) {
+                  window.open('DS Guide - Time to replace your phone.pdf', '_blank');
+                return;
+            }
+
+            // Other buttons are handled by their IDs
+            const targetId = e.target.id;
+            switch (targetId) {
+                case 'yes-btn':
+                    const currentPageDataYes = pages[currentPageId];
+                    if (currentPageDataYes && currentPageDataYes.nextStep) {
+                        currentPageId = currentPageDataYes.nextStep;
+                        renderPage();
+                    }
+                    break;
+                case 'no-btn':
+                    const currentPageDataNo = pages[currentPageId];
+                    if (currentPageDataNo && currentPageDataNo.noStep) {
+                        currentPageId = currentPageDataNo.noStep;
+                        renderPage();
+                    }
+                    break;
+                case 'back-btn':
+                    pageHistory.pop();
+                    currentPageId = pageHistory.pop() || 'start';
+                    renderPage();
+                    break;
+                case 'start-over-btn':
+                    pageHistory = [];
+                    currentPageId = pages[currentPageId].startOver;
+                    renderPage();
+                    break;
+                case 'close-btn':
+                    window.close();
+                    break;
+                case 'close-detail-btn':
+                    pageHistory.pop();
+                    currentPageId = pageHistory.pop() || 'start';
+                    renderPage();
+                    break;
+            }
+
+            if (targetPageId && pages[targetPageId]) {
+                e.preventDefault();
+                currentPageId = targetPageId;
+                renderPage();
+            }
+        });
+
+        // --- Initialisation ---
+
+        document.addEventListener('DOMContentLoaded', () => {
+            if (checkDataIntegrity()) {
+                showMessage("Data correct");
+                renderPage();
+            }
+        });
+    </script>
+</body>
+</html>
+
